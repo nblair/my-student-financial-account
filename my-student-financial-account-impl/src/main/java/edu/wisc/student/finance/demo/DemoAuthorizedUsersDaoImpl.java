@@ -8,6 +8,9 @@ import java.util.List;
 
 import javax.inject.Named;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.wisc.student.finance.AuthorizedUserDao;
 import edu.wisc.student.finance.v1.AuthorizedUser;
 
@@ -20,14 +23,17 @@ import edu.wisc.student.finance.v1.AuthorizedUser;
 @Named
 public class DemoAuthorizedUsersDaoImpl extends GenericDemoDataDao<AuthorizedUser> implements
     AuthorizedUserDao {
-  
-  public DemoAuthorizedUsersDaoImpl() {
-    super(AuthorizedUser.class);
-  }
-
+  protected final Log log = LogFactory.getLog(this.getClass()); 
   List<AuthorizedUser> demoData = new ArrayList<AuthorizedUser>();
   public static final String DEMO_AUTHZ_USERS_DATA =
       "edu/wisc/student/finance/demo/demo-authorized-users-service-data.json";
+  /**
+   * Constructor passes the same type as T.
+   * @see GenericDemoDataDao#GenericDemoDataDao(Class)
+   */
+  public DemoAuthorizedUsersDaoImpl() {
+    super(AuthorizedUser.class);
+  }
 
   /*
    * (non-Javadoc)
@@ -38,14 +44,14 @@ public class DemoAuthorizedUsersDaoImpl extends GenericDemoDataDao<AuthorizedUse
   public List<AuthorizedUser> getAuthorizedUsers(String pvi) {
     return  getDemoData(pvi);
   }
-
+  /* (non-Javadoc)
+   * @see edu.wisc.student.finance.AuthorizedUserDao#addAuthorizedUser(java.lang.String, edu.wisc.student.finance.v1.AuthorizedUser)
+   */
   @Override
   public void addAuthorizedUser(String pvi, AuthorizedUser authorizedUser) {
-    System.out.println(pvi + " is authorizing " + authorizedUser); // FIXME: delete or turn into
-                                                                   // sanitized log statement
+    log.info(pvi + " is authorizing " + authorizedUser);
     this.data.get(pvi).add(authorizedUser);
   }
-
   /*
    * (non-Javadoc)
    * 

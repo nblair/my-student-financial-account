@@ -17,16 +17,15 @@ import edu.wisc.student.finance.v1.ChargeType;
  */
 @Named
 public class DemoChargeDaoImpl extends GenericDemoDataDao<ChargeType> implements ChargeDao {
-	
-	/**
-   * @param typeParameterClass
+  public static final String DEMO_CHARGE_DATA = "edu/wisc/student/finance/demo/demo-charge-service-data.json";
+
+  /**
+   * Constructor passes the same type as T.
+   * @see GenericDemoDataDao#GenericDemoDataDao(Class)
    */
   public DemoChargeDaoImpl() {
     super(ChargeType.class);
   }
-
-  public static final String DEMO_CHARGE_DATA = "edu/wisc/student/finance/demo/demo-charge-service-data.json";
-  
   /*
    * (non-Javadoc)
    * @see edu.wisc.student.finance.ChargeDao#getCharges(java.lang.String)
@@ -35,7 +34,6 @@ public class DemoChargeDaoImpl extends GenericDemoDataDao<ChargeType> implements
   public Collection<ChargeType> getCharges(String studentIdentifier) {
     return getDemoData(studentIdentifier);
   }
-
 	/* (non-Javadoc)
 	 * @see edu.wisc.student.finance.demo.GenericDemoDataDao#getDemoDataPath()
 	 */
