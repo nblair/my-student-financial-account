@@ -20,7 +20,12 @@ Executing the following at the root of the project will start the application lo
 
 Point your browser at http://localhost:8080 and you are running.
 
-Login in credentials: U admin P admin
+There are several demo user accounts available to log in with:
+
+* admin/admin
+* jane/jane
+* jim/jim
+* john/john
 
 Executing the following at the root of the project will start the application locally with Tomcat7:
 
