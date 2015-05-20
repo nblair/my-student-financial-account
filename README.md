@@ -1,5 +1,7 @@
 ## My Student Financial Account
 
+[![Build Status](https://travis-ci.org/UW-Madison-DoIT/my-student-financial-account.svg)](https://travis-ci.org/UW-Madison-DoIT/my-student-financial-account)
+
 This project is a My UW Madison App intended to provide students and parents with one location to see outstanding balances and apply payments to all University accounts.
 
 ### Developer Requirements
