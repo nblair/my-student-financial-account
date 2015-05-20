@@ -13,18 +13,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-
-import edu.wisc.student.finance.security.StudentFinancialAccountPermissionEvaluator;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import edu.wisc.student.finance.security.StudentFinancialAccountPermissionEvaluator;
 
 /**
  * {@link Configuration} enabling Spring Security's Web integration.
@@ -37,6 +38,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	static final Logger logger = LoggerFactory.getLogger(WebSecurityConfiguration.class);
+	/**
+	 * The name of the CSRF header AngularJs uses.
+	 */
 	public static final String CSRF_HEADER = "X-XSRF-TOKEN";
 	public static final String CSRF_COOKIE = "XSRF-TOKEN";
 	public static final String SESSION_COOKIE = "JSESSIONID";
@@ -67,7 +71,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.deleteCookies(SESSION_COOKIE, CSRF_COOKIE)
 				.invalidateHttpSession(true);
 	}
-
+	/**
+	 * Configure Spring Security to expect the CSRF token in the format that Angular wants to send it back (a header called "X-XRSF-TOKEN" instead of the default "X-CSRF-TOKEN"). 
+	 * 
+	 * @return an AngularJs friendly {@link HttpSessionCsrfTokenRepository}
+	 */
 	private static HttpSessionCsrfTokenRepository buildCsrfTokenRepository() {
 		HttpSessionCsrfTokenRepository tokenRepository = new HttpSessionCsrfTokenRepository();
 		tokenRepository.setHeaderName(CSRF_HEADER);
@@ -75,19 +83,22 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	}
 
 	/**
-	 * Filter to create the XSRF-TOKEN cookie that Angular.js expects.  By doing this on the server side, Angular "just works",
-	 * however, Spring does not use a cookie by default due to a known exploit:
-	 * http://lists.webappsec.org/pipermail/websecurity_lists.webappsec.org/2011-February/007533.html
-	 * TODO: This approach should be reviewed to determine whether this is still a relevant threat.
+	 * Filter intended to integrate Spring's built in CSRF support with
+	 * AngularJs's support via cookies.
+	 * 
+	 * @see https://spring.io/guides/tutorials/spring-security-and-angular-js/
+	 * @see https://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii
+	 * @see https://docs.angularjs.org/api/ng/service/$http
 	 */
-	private static Filter buildCsrfFilter() {
+	@Bean
+	Filter buildCsrfFilter() {
 		return new OncePerRequestFilter() {
 			@Override
 			protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 				CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
 				if (csrf != null) {
 					Cookie cookie = new Cookie(CSRF_COOKIE, csrf.getToken());
-					cookie.setPath("/");
+					cookie.setPath(getServletContext().getContextPath());
 					response.addCookie(cookie);
 				}
 				filterChain.doFilter(request, response);
